@@ -1,4 +1,6 @@
 import connect from "../model/studentSchema.js"
+import fs from 'fs'
+import path from 'path'
 
 
 export const showAlldata = async (req, res) => {
@@ -47,7 +49,14 @@ export const deleteStudnet = async (req, res) => {
   try {
     const sutdent = await connect.findByIdAndDelete(req.params.id);
     if (!sutdent) return res.status(400).json({ messgae: "Student Not Found" });
-    res.json({ messgae: "Student Deleted" });
+
+    if (sutdent.picture) {
+      const filepath = path.join("./upload", sutdent.picture);
+      fs.unlink(filepath, (err) => {
+        if(err) return console.log('faild to delete :' , err)
+      })
+    }
+      res.json({ messgae: "Student Deleted" });
   } catch (err) {
     res.status(500).json({message : err.message})
   }
